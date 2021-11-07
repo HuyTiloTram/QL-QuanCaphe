@@ -51,7 +51,7 @@ disconnect_db();
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
     <body>
-        <h1>Sửa sinh viên </h1>
+        <h1>Thêm sinh vien </h1>
         <a href="student-list.php">Trở về</a> <br/> <br/>
         <form method="post" action="student-edit.php?id=<?php echo $data['sv_id']; ?>">
             <table width="50%" border="1" cellspacing="0" cellpadding="10">
