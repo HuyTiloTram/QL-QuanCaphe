@@ -25,3 +25,13 @@ function get_all_loaisanpham()
     // Trả kết quả về
     return $result;
 }
+function disconnect_db()
+{
+    // Gọi tới biến toàn cục $conn
+    global $conn;
+
+    // Nếu đã kêt nối thì thực hiện ngắt kết nối
+    if ($conn){
+        mysqli_close($conn);
+    }
+}

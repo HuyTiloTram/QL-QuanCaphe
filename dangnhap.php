@@ -3,90 +3,69 @@
 session_start();
 if  (isset($_SESSION['username']))  {
   if ($_SESSION['level']==1)
-  {header("location: student-list.php");die;}
+  {header("location: tongquan");die;}
   else
-  {header("location: student-list_member2.php");die;}
+  {header("location: pos");die;}
 }
-
-
-
 
 //Khai báo utf-8 để hiển thị được tiếng việt
 header('Content-Type: text/html; charset=UTF-8');
 
 //Xử lý đăng nhập
-if (isset($_POST['dangnhap']))
+if (isset($_POST['login']))
 {
-    //Kết nối tới database
-    include('ketnoi.php');
-    include('libs/members.php');
+  function login(){
+    if ( (isset($_POST['txtUsername'])) || (isset($_POST['txtPassword'])) ) ; else {$er= "Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu.";return $er;}
+    if (strpos($_POST['txtUsername'], ' ') !== false)  return $er= "Vui lòng không nhập khoảng trắng trong tên đăng nhập";
 
-    //Lấy dữ liệu nhập vào
+    include 'ketnoi.php';
     $username = addslashes($_POST['txtUsername']);
     $password = addslashes($_POST['txtPassword']);
-
-    //Kiểm tra đã nhập đủ tên đăng nhập với mật khẩu chưa
-    if (!$username || !$password) {
-        echo "Vui lòng nhập đầy đủ tên đăng nhập và mật khẩu. <a href='javascript: history.go(-1)'>Trở lại</a>";
-        exit;
+    if (strpos($_POST['txtUsername'], '@') !== false){
+      $query = mysqli_query($conn,"SELECT email FROM members WHERE email='$username'");
+      if (mysqli_num_rows($query) == 0) {  $er= 'Email này không tồn tại. Vui lòng kiểm tra lại';return $er;}
+      $query = mysqli_query($conn,"SELECT email,username,password,level FROM members WHERE email='$username'");
     }
-
-    // mã hóa pasword
+    else{
+      $query = mysqli_query($conn,"SELECT username FROM members WHERE username='$username'");
+      if (mysqli_num_rows($query) == 0) {  $er= 'Tên đăng nhập này không tồn tại. Vui lòng kiểm tra lại';return $er;}
+      $query = mysqli_query($conn,"SELECT username,password,level FROM members WHERE username='$username'");
+    }
+    $usersitem = mysqli_fetch_assoc($query);
     $password = md5($password);
-
-    //Kiểm tra tên đăng nhập có tồn tại không
-    $query = mysqli_query($conn,"SELECT username, password FROM members WHERE username='$username'");
-    if (mysqli_num_rows($query) == 0) {
-        echo "Tên đăng nhập này không tồn tại. Vui lòng kiểm tra lại. <a href='javascript: history.go(-1)'>Trở lại</a>";
-        exit;
-    }
-
-    //Lấy mật khẩu trong database ra
-    $row = mysqli_fetch_assoc($query);
-
-    //So sánh 2 mật khẩu có trùng khớp hay không
-    if ($password != $row['password']) {
-        echo "Mật khẩu không đúng. Vui lòng nhập lại. <a href='javascript: history.go(-1)'>Trở lại</a>";
-        exit;
-    }
-    // lấy về level
-    $usertype_id= get_member($username)['level'];
-
+    if ($password != $usersitem['password']) {$er= "Mật khẩu không đúng. Vui lòng nhập lại";return $er; }
     //Lưu tên đăng nhập và loại người dùng
     $_SESSION['username'] = $username;
-    $_SESSION['level'] = $usertype_id;
+    $_SESSION['level'] = $usersitem['level'];
+    date_default_timezone_set('Asia/Ho_Chi_Minh');
     $_SESSION['time_login'] = time();
-    header("location: student-list.php");
-    die();
-
+    return 'thanhcong';
+  } $check=login();if($check=='thanhcong') {header("location: tongquan");die;}
 }
 ?>
-
 <!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Login - Phần mềm quản lý quán cà phê</title>
+  <link rel="stylesheet" type="text/css" href="include/css/styleLogin.css">
+  <style type="text/css">
+    .bg{background:url(images/background/bg2.jpg) no-repeat;background-size:cover;height:100%;width:100%;position:fixed;top:0;left:0;z-index:-3}
+  </style>
+</head>
+<body>
+  <div class="bg "></div> <!-- <div class="star-field"><div class="layer"></div><div class="layer"></div><div class="layer"></div>-->
+  <form action='dangnhap.php' method='POST'>
+	<div class="form-box"  >
+    <div class="thongbao"><?php if(isset($check)) echo $check; ?> </div>
+		<div class="header-text">Login Form</div>
+    <input name='txtUsername' placeholder="Your Username or Email Address"  type='text' value="<?php if(isset($_POST['txtUsername'])) echo $_POST['txtUsername'] ?>">
+    <input name='txtPassword' placeholder="Your Password" id="password-field" type="password" value="<?php if(isset($_POST['txtPassword'])) echo $_POST['txtPassword'] ?>">
 
-<html>
-    <head>
-        <title></title>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    </head>
-    <body>
-        <form action='dangnhap.php?do=login' method='POST'>
-            <table cellpadding='0' cellspacing='0' border='1'>
-                <tr>
-                    <td>Tên đăng nhập :</td>
-                    <td>
-                        <input type='text' name='txtUsername' />
-                    </td>
-                </tr>
-                <tr>
-                    <td>Mật khẩu :</td>
-                    <td>
-                        <input type='password' name='txtPassword' />
-                    </td>
-                </tr>
-            </table>
-            <input type='submit' value='Đăng nhập' name="dangnhap" />
-            <a href='dangky.php' title='Đăng ký'>Đăng ký</a>
-        </form>
-    </body>
+    <input id="terms" type="checkbox"> <label for="terms"></label><span>Agree with <a>Terms & Conditions</a></span>
+    <button name="login" type='submit'>login</button>
+    <span><a href='dangky.php'>Sign up</a> <a style="margin-left:175px;white-space: nowrap;">Forgot Password </a></span>
+	</div>
+</form>
+</body>
 </html>

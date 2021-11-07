@@ -1,0 +1,14 @@
+link:
+http://localhost/QL-QuanCaphe/dangnhap.php/
+http://localhost/QL-QuanCaphe/dangky.php/
+http://localhost/QL-QuanCaphe/tongquan/
+http://localhost/QL-QuanCaphe/pos/
+http://localhost/QL-QuanCaphe/hoadon/
+http://localhost/QL-QuanCaphe/thucdon/
+http://localhost/QL-QuanCaphe/nhanvien/
+http://localhost/QL-QuanCaphe/khachhang/
+
+acccount:
+username:huyquantri pass:huy123 Admin
+username:donatram2  pass:tram123
+username:boy1dollar  pass:boy123 
